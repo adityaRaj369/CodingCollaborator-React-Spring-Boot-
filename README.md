@@ -92,8 +92,7 @@ CodeFuse/
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/adityaRaj369/CodeFuse.git
-   cd CodeFuse
+   git clone https://github.com/adityaRaj369/CodingCollaborator-React-Spring-Boot-.git
    ```
 
 2. Install dependencies for frontend:
