@@ -69,13 +69,11 @@ CodeFuse/
 │       ├── components/ # Reusable UI components
 │       ├── pages/      # Application pages
 │       └── utils/      # Helper functions and utilities
-├── server/             # Backend application (Spring Boot)
+├── codeColab/             # Backend application (Spring Boot)
 │   └── src/
 │       └── main/
 │           ├── java/
 │           └── resources/
-├── .env                # Environment variables
-├── package.json        # Project dependencies and scripts
 └── README.md           # Project documentation
 ```
 
