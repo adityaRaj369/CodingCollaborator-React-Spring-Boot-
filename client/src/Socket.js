@@ -1,75 +1,61 @@
-// import {io} from 'socket.io-client';
 
-// export const initSocket = async () =>{
-//     const options = {
-//         'force new connection': true,
-//         reconnectionAttempts : 'Infinity',
-//         timeout: 10000,
-//         transports: ['websocket'],
-//     };
-//     return io(process.env.REACT_APP_BACKEND_URL, options);
-// }
-import SockJS from 'sockjs-client';
-import { Client } from '@stomp/stompjs';
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+import { ACTIONS } from "./Actions";
 
-let stompClient = null;
+let subscriptions = [];
 
-export const initSocket = async () => {
+export async function initSocket() {
   const socket = new SockJS(`${process.env.REACT_APP_BACKEND_URL}/ws`);
-  stompClient = new Client({
+  const client = new Client({
     webSocketFactory: () => socket,
     reconnectDelay: 5000,
-    debug: (str) => console.log(str),
+    heartbeatIncoming: 4000,
+    heartbeatOutgoing: 4000,
+    onConnect: () => {
+      console.log("STOMP client connected");
+    },
+    onStompError: (frame) => {
+      console.error("STOMP error:", frame);
+    },
+    onWebSocketError: (error) => {
+      console.error("WebSocket error:", error);
+    },
+  });
+
+  client.activate();
+
+  // Wait for connection
+  await new Promise((resolve, reject) => {
+    client.onConnect = () => resolve();
+    client.onWebSocketError = (error) => reject(error);
+    setTimeout(() => reject(new Error("Socket connection timeout")), 10000);
   });
 
   return {
-    on: (event, callback, roomId) => {
-      stompClient.onConnect = () => {
-        console.log('Connected to STOMP');
-        if (event === 'JOINED' || event === 'CODE_CHANGE' || event === 'DISCONNECTED') {
-          stompClient.subscribe(`/topic/room/${roomId}`, (message) => {
-            const data = JSON.parse(message.body);
-            if (data.type === event) {
-              callback(data.payload);
-            }
-          });
-        }
-      };
-      stompClient.onStompError = (frame) => {
-        console.error('STOMP error:', frame);
-      };
-      stompClient.onWebSocketError = (error) => {
-        console.error('WebSocket error:', error);
-      };
-      stompClient.activate();
-    },
-    emit: (event, payload) => {
-      if (stompClient && stompClient.connected) {
-        const destination = {
-          JOIN: '/app/join',
-          CODE_CHANGE: '/app/code-change',
-          SYNC_CODE: '/app/sync-code',
-        }[event];
-        if (destination) {
-          stompClient.publish({
-            destination,
-            body: JSON.stringify({ type: event, payload }),
-          });
-          console.log(`Emitted ${event}:`, payload);
-        } else {
-          console.warn(`Unknown event: ${event}`);
-        }
+    emit: (event, data) => {
+      if (client.connected) {
+        console.log("Emitting event:", event, data);
+        client.publish({ destination: `/app/${event.toLowerCase()}`, body: JSON.stringify(data) });
       } else {
-        console.warn('STOMP client not connected');
+        console.warn("STOMP client not connected, cannot emit:", event);
       }
+    },
+    on: (event, callback, roomId) => {
+      const subscription = client.subscribe(`/topic/room/${roomId}`, (message) => {
+        const data = JSON.parse(message.body);
+        console.log("Received message:", event, data);
+        if (data.type === event) {
+          callback(data, roomId);
+        }
+      });
+      subscriptions.push(subscription);
     },
     disconnect: () => {
-      if (stompClient) {
-        stompClient.deactivate();
-        stompClient = null;
-        console.log('STOMP client disconnected');
-      }
+      subscriptions.forEach((sub) => sub.unsubscribe());
+      subscriptions = [];
+      client.deactivate();
+      console.log("STOMP client disconnected");
     },
-    id: null, // STOMP client doesn't expose session ID, handled by backend
   };
-};
+}

@@ -1,8 +1,9 @@
-package com.example.repository;
+package com.example.codecolab.repository;
 
-import com.example.codecollab.*;
+import com.example.codecolab.model.SavedCode;
+import com.example.codecolab.*;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import com.example.model.SavedCode;
+
 import java.util.List;
 
 public interface SavedCodeRepository extends MongoRepository<SavedCode, String> {

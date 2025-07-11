@@ -2,39 +2,27 @@
   display: flex;
   align-items: center;
   padding: 8px;
-  margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  transition: background 0.2s ease;
-}
-
-.client:hover {
   background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-bottom: 8px;
 }
 
-.client-photo {
+.client img,
+.avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   margin-right: 10px;
-}
-
-.client-img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #50fa7b;
 }
 
-.client-img-placeholder {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #6272a4;
+.avatar-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  background: #6272a4;
+  color: white;
   font-weight: bold;
-  border: 2px solid #50fa7b;
 }
 
 .client-info {
@@ -42,14 +30,12 @@
   flex-direction: column;
 }
 
-.client-username {
+.username {
+  font-weight: bold;
   color: #f8f8f2;
-  font-weight: 600;
-  font-family: 'Orbitron', sans-serif;
 }
 
-.client-email {
-  color: #bd93f9;
+.email {
   font-size: 0.8em;
-  font-family: 'Orbitron', sans-serif;
+  color: #bd93f9;
 }

@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.codecolab.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -17,4 +17,8 @@ public class SavedCode {
     private String code;
     private String language;
     private Date createdAt = new Date();
+    public void setCreatedAt(long timeMillis) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCreatedAt'");
+    }
 }
